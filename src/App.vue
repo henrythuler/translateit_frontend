@@ -1,12 +1,16 @@
 <template>
-  <TheHeader />
-  <RouterView />
+    <TheHeader />
+    <RouterView />
 </template>
 
 <script setup>
-  import { RouterView } from 'vue-router'
-  import TheHeader from '@/components/layout/TheHeader.vue'
+    import { RouterView } from 'vue-router'
+    import TheHeader from '@/components/layout/TheHeader.vue'
 </script>
 
-<style scoped>
+<style>
+    body{
+        height: 100vh;
+        background-color: #080808;
+    }
 </style>

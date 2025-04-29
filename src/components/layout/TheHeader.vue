@@ -60,7 +60,7 @@
 <style scoped>
     header {
         background-color: #080808;
-        border-bottom: 1px solid #1d1d1d;
+        border-bottom: 2px solid #1d1d1d;
         position: relative;
     }
 
