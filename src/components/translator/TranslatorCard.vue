@@ -6,7 +6,7 @@
         </div>
 
         <template #actions>
-            <div class="d-flex flex-column gap-2">
+            <div class="d-flex flex-column flex-md-row gap-2 w-100">
                 <BaseButton class="btn btn-outline-light w-100" @click="$emit('view-documents')">
                     Documents
                 </BaseButton>
@@ -38,6 +38,6 @@
 <style scoped>
     .translator-card {
         width: 100%;
-        max-width: 400px;
+        max-width: 420px;
     }
 </style>

@@ -42,18 +42,18 @@
         //Mock
         try {
             translators.value = [
-                // {
-                //     name: 'Fulano Silva',
-                //     email: 'fulano1@bureauworks.com',
-                //     source_language: 'en_US',
-                //     target_language: 'es_ES',
-                // },
-                // {
-                //     name: 'Fulano Souza',
-                //     email: 'fulano2@bureauworks.com',
-                //     source_language: 'pt_BR',
-                //     target_language: 'fr_FR',
-                // },
+                {
+                    name: 'Fulano Silva',
+                    email: 'fulano1@bureauworks.com',
+                    source_language: 'en_US',
+                    target_language: 'es_ES',
+                },
+                {
+                    name: 'Fulano Souza',
+                    email: 'fulano2@bureauworks.com',
+                    source_language: 'pt_BR',
+                    target_language: 'fr_FR',
+                },
             ]
         } catch (err) {
             console.error('Failed to fetch translators', err)

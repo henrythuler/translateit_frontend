@@ -21,3 +21,9 @@
 
     defineEmits(['close'])
 </script>
+
+<style scoped>
+    p {
+        word-break: break-all;
+    }
+</style>
