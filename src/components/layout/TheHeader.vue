@@ -3,7 +3,7 @@
         <nav class="navbar container d-flex justify-content-between align-items-center">
 
             <router-link class="navbar-brand text-white" to="/">
-                <h1 class="m-0 fs-3 fs-md-2">TranslateIt</h1>
+                <h1 class="m-0 fs-1">TranslateIt</h1>
             </router-link>
 
             <!-- Desktop Navigation -->
