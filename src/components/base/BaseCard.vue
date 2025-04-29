@@ -1,17 +1,17 @@
 <template>
-    <div class="base-card p-3 rounded-3 text-white">
-        <div class="card-header d-flex justify-content-between align-items-start">
-            <div class="card-info">
+    <div class="base-card p-3 rounded-3 text-white d-flex flex-column justify-content-center align-items-center justify-content-md-between align-items-md-center">
+        <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-center w-100">
+            <div class="card-info text-center text-md-start mb-1 mb-md-0">
                 <h3 class="card-title">{{ title }}</h3>
                 <p v-if="description" class="card-description">{{ description }}</p>
             </div>
 
-            <div class="card-actions d-flex flex-column align-items-end gap-2">
+            <div class="card-actions d-flex flex-column gap-2 justify-items-center mt-1 mt-md-0">
                 <slot name="actions" />
             </div>
         </div>
 
-        <div v-if="$slots.default" class="card-content mt-3">
+        <div v-if="$slots.default" class="card-footer mt-3 w-100">
             <slot />
         </div>
     </div>
@@ -35,6 +35,14 @@
         font-size: 1.5rem;
     }
 
+    .card-info {
+        width: 100%;
+    }
+
+    .card-actions {
+        width: 100%;
+    }
+
     .card-description {
         font-size: 1rem;
         color: #cccccc;
@@ -42,5 +50,15 @@
 
     .card-actions .actions {
         width: 100%;
+    }
+
+    @media (min-width: 768px){
+        .card-info {
+            width: 70%;
+        }
+
+        .card-actions {
+            width: 30%;
+        }
     }
 </style>

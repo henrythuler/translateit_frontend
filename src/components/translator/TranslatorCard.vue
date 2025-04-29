@@ -1,20 +1,22 @@
 <template>
     <BaseCard class="translator-card" :title="translator.name" :description="translator.email">
-        <div class="d-flex justify-content-between text-white mt-3">
+        <div class="d-flex justify-content-between text-white mt-3 w-100">
             <span><strong>From:</strong> {{ translator.source_language }}</span>
             <span><strong>To:</strong> {{ translator.target_language }}</span>
         </div>
 
         <template #actions>
-            <BaseButton class="btn btn-outline-light" @click="$emit('view-documents')">
-                View Documents
-            </BaseButton>
-            <BaseButton class="btn btn-outline-warning" @click="$emit('update')">
-                Update
-            </BaseButton>
-            <BaseButton class="btn btn-outline-danger" @click="$emit('delete')">
-                Delete
-            </BaseButton>
+            <div class="d-flex flex-column gap-2">
+                <BaseButton class="btn btn-outline-light w-100" @click="$emit('view-documents')">
+                    Documents
+                </BaseButton>
+                <BaseButton class="btn btn-outline-warning w-100" @click="$emit('update')">
+                    Update
+                </BaseButton>
+                <BaseButton class="btn btn-outline-danger w-100" @click="$emit('delete')">
+                    Delete
+                </BaseButton>
+            </div>
         </template>
     </BaseCard>
 </template>
@@ -35,6 +37,7 @@
 
 <style scoped>
     .translator-card {
-        max-width: 500px;
+        width: 100%;
+        max-width: 400px;
     }
 </style>
