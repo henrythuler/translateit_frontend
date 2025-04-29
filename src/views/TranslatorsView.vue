@@ -5,7 +5,7 @@
             <BaseButton @click="showCreateModal = true">New Translator</BaseButton>
         </div>
 
-        <div v-if="translators.length === 0" class="text-white text-center h2 mt-5">
+        <div v-if="translators.length === 0" class="text-white text-center h3 mt-5">
             No Translators found, please insert them first by clicking on "New Translator".
         </div>
 
@@ -14,6 +14,7 @@
                 v-for="translator in translators"
                 :key="translator.email"
                 :translator="translator"
+                @view-documents="seeTranslatorDocuments(translator)"
             />
         </div>
 
@@ -27,11 +28,13 @@
 
 <script setup>
     import { ref, onMounted } from 'vue'
+    import { useRouter } from 'vue-router'
     import TranslatorCard from '@/components/translator/TranslatorCard.vue'
     import CreateTranslatorModal from '@/components/translator/CreateTranslatorModal.vue'
     import BaseButton from '@/components/base/BaseButton.vue'
     //import api from '@/services/api'
 
+    const router = useRouter()
     const translators = ref([])
     const showCreateModal = ref(false)
 
@@ -39,27 +42,38 @@
         //Mock
         try {
             translators.value = [
-                {
-                name: 'Fulano Silva',
-                email: 'fulano1@bureauworks.com',
-                source_language: 'en_US',
-                target_language: 'es_ES',
-                },
-                {
-                name: 'Fulano Souza',
-                email: 'fulano2@bureauworks.com',
-                source_language: 'pt_BR',
-                target_language: 'fr_FR',
-                },
+                // {
+                //     name: 'Fulano Silva',
+                //     email: 'fulano1@bureauworks.com',
+                //     source_language: 'en_US',
+                //     target_language: 'es_ES',
+                // },
+                // {
+                //     name: 'Fulano Souza',
+                //     email: 'fulano2@bureauworks.com',
+                //     source_language: 'pt_BR',
+                //     target_language: 'fr_FR',
+                // },
             ]
         } catch (err) {
             console.error('Failed to fetch translators', err)
         }
     }
 
-    const handleCreated = (newTranslator) => {
-        translators.value.push(newTranslator)
+    const handleCreated = (newTranslators) => {
+        for (const t of newTranslators){
+            translators.value.push(t)
+        }
         showCreateModal.value = false
+    }
+
+    const seeTranslatorDocuments = (translator) => {
+        router.push({
+            name: 'Documents',
+            query: {
+                author: translator.email
+            }
+        })
     }
 
     onMounted(() => {

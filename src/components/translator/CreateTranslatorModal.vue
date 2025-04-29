@@ -7,32 +7,62 @@
         <form @submit.prevent="handleFormSubmit">
             <div class="mb-3">
                 <label for="name" class="form-label text-white">Name</label>
-                <input id="name" v-model="form.name" class="form-control" required />
+                <input
+                    id="name"
+                    v-model="form.name"
+                    class="form-control"
+                    maxlength="100"
+                />
             </div>
 
             <div class="mb-3">
                 <label for="email" class="form-label text-white">Email</label>
-                <input id="email" v-model="form.email" type="email" class="form-control" required />
+                <input
+                    id="email"
+                    v-model="form.email"
+                    type="email"
+                    class="form-control"
+                    maxlength="255"
+                />
             </div>
 
             <div class="mb-3 d-flex gap-2">
                 <div class="flex-grow-1">
                     <label for="source" class="form-label text-white">Source Language</label>
-                    <input id="source" v-model="form.source_language" class="form-control" required />
+                    <input
+                        id="source"
+                        v-model="form.source_language"
+                        class="form-control"
+                        maxlength="5"
+                    />
                 </div>
                 <div class="flex-grow-1">
                     <label for="target" class="form-label text-white">Target Language</label>
-                    <input id="target" v-model="form.target_language" class="form-control" required />
+                    <input
+                        id="target"
+                        v-model="form.target_language"
+                        class="form-control"
+                        maxlength="5"
+                    />
                 </div>
             </div>
 
             <div class="mb-3">
                 <label class="form-label text-white">Import from CSV</label>
-                <input type="file" accept=".csv" @change="handleCsv" class="form-control" />
+                <input
+                    type="file"
+                    accept=".csv"
+                    @change="handleCsv"
+                    class="form-control"
+                />
             </div>
 
             <div class="text-end">
-                <button :disabled="!isFormValid()" type="submit" class="btn btn-primary bg-orange border-0">
+                <button
+                    :disabled="!isFormValid()"
+                    type="submit"
+                    class="btn btn-primary bg-orange border-0"
+                >
                     Send
                 </button>
             </div>
@@ -67,8 +97,15 @@
         // TODO: send request
         if (csvFile.value) {
             emit('created', { csv: csvFile.value })
+            emit('close')
         } else {
-            emit('created', { ...form.value })
+            const translator = {
+                name: form.value.name,
+                email: form.value.email,
+                source_language: form.value.source_language,
+                target_language: form.value.target_language
+            }
+            emit('created', translator)
         }
         emit('close')
     }
@@ -89,9 +126,5 @@
 <style scoped>
     .bg-orange {
         background-color: #f96418 !important;
-    }
-
-    input {
-        outline: 0;
     }
 </style>
