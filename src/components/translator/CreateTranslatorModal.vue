@@ -32,8 +32,8 @@
             </div>
 
             <div class="text-end">
-                <button type="submit" class="btn btn-primary bg-orange border-0">
-                    Create Translator
+                <button :disabled="!isFormValid()" type="submit" class="btn btn-primary bg-orange border-0">
+                    Send
                 </button>
             </div>
         </form>
@@ -57,21 +57,41 @@
         target_language: ''
     })
 
+    const csvFile = ref(null)
+
     const handleFormSubmit = () => {
-        // TODO: validate and send request
-        emit('created', { ...form.value })
+        if (!isFormValid()) {
+            alert("Please fill all fields or upload a CSV file.")
+            return
+        }
+        // TODO: send request
+        if (csvFile.value) {
+            emit('created', { csv: csvFile.value })
+        } else {
+            emit('created', { ...form.value })
+        }
         emit('close')
     }
 
+    const isFormValid = () => {
+        const f = form.value
+        return (
+            csvFile.value || (f.name.trim() && f.email.trim() && f.source_language.trim() && f.target_language.trim())
+        )
+    }
+
     const handleCsv = (e) => {
-        const file = e.target.files[0]
-        if (!file) return
-        // TODO: Read CSV and send request
+        csvFile.value = e.target.files[0]
+        if (!csvFile.value) return
     }
 </script>
 
 <style scoped>
     .bg-orange {
         background-color: #f96418 !important;
+    }
+
+    input {
+        outline: 0;
     }
 </style>
