@@ -104,7 +104,7 @@
             const document = {
                 subject: form.value.subject,
                 content: form.value.content,
-                locale: form.value.locale ? form.value.content : "",
+                locale: form.value?.locale || "",
                 author: form.value.author
             }
             emit('created', document)

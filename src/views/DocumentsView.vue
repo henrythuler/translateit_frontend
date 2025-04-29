@@ -12,13 +12,25 @@
         </div>
 
         <div v-else class="row g-3">
-            <!-- Documents List -->
+            <div
+                v-for="document in documents"
+                :key="document.author"
+                class="col-12 col-md-6 col-lg-4 d-flex justify-content-center"
+            >
+                <DocumentCard :document="document" @view-details="openDetails(document)" />
+            </div>
         </div>
 
         <CreateDocumentModal 
             :visible="showCreateModal" 
             @close="showCreateModal = false"
             @created="handleCreated"
+        />
+
+        <DocumentDetailsModal
+            :visible="showDetailsModal"
+            :document="selectedDocument"
+            @close="showDetailsModal = false"
         />
     </div>
 </template>
@@ -30,12 +42,20 @@
     import CreateDocumentModal from '@/components/document/CreateDocumentModal.vue'
 
     const route = useRoute()
+
     const showCreateModal = ref(false)
+    const showDetailsModal = ref(false)
+    const selectedDocument = ref(null)
 
     const author = computed(() => route.query.author || '')
     const documents = ref([]) 
 
-    function handleCreated(newDocument) {
+    const handleCreated = (newDocument) => {
         documents.value.push(newDocument)
+    }
+
+    const openDetails = (document) => {
+        selectedDocument.value = document
+        showDetailsModal.value = true
     }
 </script>
