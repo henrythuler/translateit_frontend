@@ -1,15 +1,15 @@
 <template>
     <div class="container mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-3">
             <h2 class="text-white m-0">Translators</h2>
             <BaseButton @click="showCreateModal = true">New Translator</BaseButton>
         </div>
 
         <div v-if="translators.length === 0" class="text-white text-center h2 mt-5">
-            No Translators found, please insert them first.
+            No Translators found, please insert them first by clicking on "New Translator".
         </div>
 
-        <div v-else class="d-flex flex-wrap justify-content-center gap-4">
+        <div v-else class="d-flex flex-wrap justify-content-center gap-4 py-4">
             <TranslatorCard
                 v-for="translator in translators"
                 :key="translator.email"
@@ -26,53 +26,43 @@
 </template>
 
 <script setup>
-    import { ref } from 'vue'
+    import { ref, onMounted } from 'vue'
     import TranslatorCard from '@/components/translator/TranslatorCard.vue'
-    import BaseButton from '@/components/base/BaseButton.vue'
     import CreateTranslatorModal from '@/components/translator/CreateTranslatorModal.vue'
+    import BaseButton from '@/components/base/BaseButton.vue'
+    //import api from '@/services/api'
 
+    const translators = ref([])
     const showCreateModal = ref(false)
 
-    const translators = ref([
-        {
-            name: 'Test',
-            email: 'test@email.com',
-            source_language: 'pt_BR',
-            target_language: 'en_US'
-        },
-        {
-            name: 'Test',
-            email: 'test@email.com',
-            source_language: 'pt_BR',
-            target_language: 'en_US'
-        },
-        {
-            name: 'Test',
-            email: 'test@email.com',
-            source_language: 'pt_BR',
-            target_language: 'en_US'
-        },
-        {
-            name: 'Test',
-            email: 'test@email.com',
-            source_language: 'pt_BR',
-            target_language: 'en_US'
-        },
-        {
-            name: 'Test',
-            email: 'test@email.com',
-            source_language: 'pt_BR',
-            target_language: 'en_US'
-        },
-        {
-            name: 'Test',
-            email: 'test@email.com',
-            source_language: 'pt_BR',
-            target_language: 'en_US'
+    const fetchTranslators = async () => {
+        //Mock
+        try {
+            translators.value = [
+                {
+                name: 'Fulano Silva',
+                email: 'fulano1@bureauworks.com',
+                source_language: 'en_US',
+                target_language: 'es_ES',
+                },
+                {
+                name: 'Fulano Souza',
+                email: 'fulano2@bureauworks.com',
+                source_language: 'pt_BR',
+                target_language: 'fr_FR',
+                },
+            ]
+        } catch (err) {
+            console.error('Failed to fetch translators', err)
         }
-    ])
-
-    const handleCreated = (data) => {
-        console.log('Created:', data)
     }
+
+    const handleCreated = (newTranslator) => {
+        translators.value.push(newTranslator)
+        showCreateModal.value = false
+    }
+
+    onMounted(() => {
+        fetchTranslators()
+    })
 </script>

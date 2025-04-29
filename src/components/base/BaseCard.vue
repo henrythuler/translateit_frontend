@@ -1,6 +1,6 @@
 <template>
     <div class="base-card p-3 rounded-3 text-white d-flex flex-column justify-content-center align-items-center justify-content-md-between align-items-md-center">
-        <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-center w-100">
+        <div class="card-header d-flex flex-column flex-md-row justify-content-between gap-md-2 align-items-center w-100">
             <div class="card-info text-center text-md-start mb-1 mb-md-0">
                 <h3 class="card-title">{{ title }}</h3>
                 <p v-if="description" class="card-description">{{ description }}</p>
@@ -54,7 +54,7 @@
 
     @media (min-width: 768px){
         .card-info {
-            width: 70%;
+            width: 65%;
         }
 
         .card-actions {

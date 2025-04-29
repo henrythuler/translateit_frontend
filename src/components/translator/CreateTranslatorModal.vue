@@ -1,7 +1,7 @@
 <template>
     <BaseModal 
         :visible="visible" 
-        title="Insert Translator" 
+        title="New Translator" 
         @close="$emit('close')"
     >
         <form @submit.prevent="handleFormSubmit">
