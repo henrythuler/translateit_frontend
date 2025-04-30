@@ -1,8 +1,8 @@
 <template>
     <BaseCard class="translator-card" :title="translator.name" :description="translator.email">
         <div class="d-flex justify-content-between text-white mt-3 w-100">
-            <span><strong>From:</strong> {{ translator.source_language }}</span>
-            <span><strong>To:</strong> {{ translator.target_language }}</span>
+            <span><strong>From:</strong> {{ translator.sourceLanguage }}</span>
+            <span><strong>To:</strong> {{ translator.targetLanguage }}</span>
         </div>
 
         <template #actions>

@@ -6,19 +6,26 @@
         </div>
 
         <div class="flex-grow-1 overflow-y-auto mb-2">
-            <div v-if="translators.length === 0" class="text-white text-center h3 mt-5">
+            <div v-if="store.translators.length === 0" class="text-white text-center h3 mt-5">
                 No Translators found, please insert them first by clicking on "New Translator".
             </div>
 
             <div v-else class="overflow-y-auto d-flex flex-wrap justify-content-center gap-4 py-4">
                 <TranslatorCard
-                    v-for="translator in translators"
-                    :key="translator.email"
+                    v-for="translator in store.translators"
+                    :key="translator.id"
                     :translator="translator"
                     @view-documents="seeTranslatorDocuments(translator)"
                 />
             </div>
         </div>
+
+        <BasePagination
+            :currentPage="currentPage"
+            :totalPages="store.totalPages"
+            :pageSize="pageSize"
+            @update:page="handlePageChange"
+        />
 
         <CreateTranslatorModal
             :visible="showCreateModal"
@@ -29,45 +36,40 @@
 </template>
 
 <script setup>
-    import { ref, onMounted } from 'vue'
-    import { useRouter } from 'vue-router'
+    import { ref, onMounted, computed } from 'vue'
+    import { useRoute, useRouter } from 'vue-router'
+    import { useTranslatorStore } from '@/stores/translatorStore'
+    import BaseButton from '@/components/base/BaseButton.vue'
     import TranslatorCard from '@/components/translator/TranslatorCard.vue'
     import CreateTranslatorModal from '@/components/translator/CreateTranslatorModal.vue'
-    import BaseButton from '@/components/base/BaseButton.vue'
-    //import api from '@/services/api'
+    import BasePagination from '@/components/base/BasePagination.vue'
 
+    const route = useRoute()
     const router = useRouter()
-    const translators = ref([])
+    const store = useTranslatorStore()
+
     const showCreateModal = ref(false)
+    // const showDetailsModal = ref(false)
+    // const selectedTranslator = ref(null)
 
-    const fetchTranslators = async () => {
-        //Mock
-        try {
-            translators.value = [
-                {
-                    name: 'Fulano Silva',
-                    email: 'fulano1@bureauworks.com',
-                    source_language: 'en_US',
-                    target_language: 'es_ES',
-                },
-                {
-                    name: 'Fulano Souza',
-                    email: 'fulano2@bureauworks.com',
-                    source_language: 'pt_BR',
-                    target_language: 'fr_FR',
-                },
-            ]
-        } catch (err) {
-            console.error('Failed to fetch translators', err)
-        }
+    const email = computed(() => route.query.email || '')
+    const currentPage = ref(1)
+    const pageSize = 9
+
+    const handlePageChange = (newPage) => {
+        currentPage.value = newPage
+        store.fetchTranslators({
+            page: newPage - 1,
+            size: pageSize,
+            sort: 'createdAt,desc',
+            email: email.value
+        })
     }
 
-    const handleCreated = (newTranslators) => {
-        for (const t of newTranslators){
-            translators.value.push(t)
-        }
-        showCreateModal.value = false
-    }
+    // const openDetails = (translator) => {
+    //     selectedTranslator.value = translator
+    //     showDetailsModal.value = true
+    // }
 
     const seeTranslatorDocuments = (translator) => {
         router.push({
@@ -79,6 +81,11 @@
     }
 
     onMounted(() => {
-        fetchTranslators()
+        store.fetchTranslators({
+            page: currentPage.value - 1,
+            size: pageSize,
+            sort: 'createdAt,desc',
+            email: email.value
+        })
     })
 </script>

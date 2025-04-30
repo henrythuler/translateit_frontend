@@ -67,4 +67,10 @@
         color: white;
         border: 1px solid #f96418;
     }
+
+    .page-link:hover{
+        background-color: #f96418;
+        color: white;
+        border: 1px solid #f96418;
+    }
 </style>
