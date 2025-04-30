@@ -1,7 +1,7 @@
 <template>
     <teleport to="body">
         <transition name="fade">
-            <div v-if="visible" class="modal-shadow d-flex justify-content-center align-items-center" @click.self="emit('close')">
+            <div v-if="visible" class="modal-shadow d-flex justify-content-center align-items-center px-2" @click.self="emit('close')">
                 <div class="modal-box container-sm p-4 rounded">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="modal-title text-white m-0">{{ title }}</h5>

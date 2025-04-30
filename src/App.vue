@@ -8,5 +8,10 @@
     import TheHeader from '@/components/layout/TheHeader.vue'
 </script>
 
-<style scoped>
+<style>
+    #app{
+        max-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
 </style>

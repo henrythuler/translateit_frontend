@@ -1,24 +1,33 @@
 <template>
-    <div class="container mt-4">
+    <div class="container mt-4 d-flex flex-column">
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
             <h2 class="text-white m-0">
                 Documents <span v-if="author"> by {{ author }}</span>
             </h2>
             <BaseButton @click="showCreateModal = true">New Document</BaseButton>
         </div>
+        
+        <div class="flex-grow-1 overflow-y-auto mb-2">
+            <div v-if="store.documents.length === 0" class="h3 text-white text-center mt-5">
+                No Documents found, please insert them first by clicking on "New Document".
+            </div>
 
-        <div v-if="documents.length === 0" class="h3 text-white text-center mt-5">
-            No Documents found, please insert them first by clicking on "New Document".
+            <div v-else class="overflow-y-auto d-flex flex-wrap justify-content-center gap-4 py-4">
+                <DocumentCard
+                    v-for="document in store.documents"
+                    :key="document.id"
+                    :document="document"
+                    @view-details="openDetails(document)"
+                />
+            </div>
         </div>
 
-        <div v-else class="d-flex flex-wrap justify-content-center gap-4 py-4">
-            <DocumentCard
-                v-for="document in documents"
-                :key="document.author"
-                :document="document"
-                @view-details="openDetails(document)"
-            />
-        </div>
+        <BasePagination
+            :currentPage="currentPage"
+            :totalPages="store.totalPages"
+            :pageSize="pageSize"
+            @update:page="handlePageChange"
+        />
 
         <CreateDocumentModal 
             :visible="showCreateModal" 
@@ -35,12 +44,14 @@
 </template>
 
 <script setup>
-    import { ref, computed, onMounted } from 'vue'
+    import { ref, computed, onMounted, watch } from 'vue'
     import { useRoute } from 'vue-router'
+    import { useDocumentStore } from '@/stores/documentStore'
     import BaseButton from '@/components/base/BaseButton.vue'
     import CreateDocumentModal from '@/components/document/CreateDocumentModal.vue'
     import DocumentCard from '@/components/document/DocumentCard.vue'
     import DocumentDetailsModal from '@/components/document/DocumentDetailsModal.vue'
+    import BasePagination from '@/components/base/BasePagination.vue'
 
     const route = useRoute()
 
@@ -49,26 +60,25 @@
     const selectedDocument = ref(null)
 
     const author = computed(() => route.query.author || '')
-    const documents = ref([]) 
+    const locale = computed(() => route.query.locale || '')
 
-    const fetchDocuments = async () => {
-        //Mock
-        try {
-            documents.value = [
-                {
-                    subject: 'Introdução à Localização',
-                    content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas in fermentum tellus. Donec volutpat ipsum metus, eget finibus quam malesuada quis. Nullam sollicitudin massa efficitur porttitor vestibulum. In id felis quis dolor scelerisque fringilla id nec libero. Aliquam dapibus dapibus tortor lacinia dapibus. In et fermentum metus, mollis fringilla dolor. Sed et felis quis urna finibus consectetur. Ut hendrerit justo non quam mollis rhoncus. Morbi ut vestibulum diam. Aliquam erat volutpat. Donec quis hendrerit orci. Vivamus eget magna condimentum dui sodales efficitur. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque rhoncus velit tellus, a semper est pharetra quis. Fusce rhoncus, massa feugiat commodo blandit, metus urna porttitor sapien, sit amet convallis ex metus ut sem. Nunc vel scelerisque nisl. Vivamus sodales et dolor vel molestie. Suspendisse lobortis varius massa id mattis. Sed lectus turpis, fringilla nec lectus eu, imperdiet pellentesque mi. Aenean bibendum eu elit quis semper. Donec est est, accumsan eu ex sit amet, ullamcorper laoreet est. Vivamus porta nunc vitae libero lacinia, at ultricies turpis vehicula. Integer laoreet metus iaculis, accumsan felis ac, hendrerit enim. Maecenas in sapien sit amet mauris elementum tristique at vel ligula. Phasellus suscipit sed tortor condimentum dictum. Mauris dictum mauris.',
-                    locale: 'pt-BR',
-                    author: 'fulano1@bureauworks.com',
-                },
-            ]
-        } catch (err) {
-            console.error('Failed to fetch documents', err)
-        }
+    const store = useDocumentStore()
+    const currentPage = ref(1)
+    const pageSize = 9
+
+    const handlePageChange = (newPage) => {
+        currentPage.value = newPage
+        store.fetchDocuments({ page: newPage - 1, size: pageSize })
     }
 
-    const handleCreated = (newDocument) => {
-        documents.value.push(newDocument)
+    const fetchDocuments = () => {
+        store.fetchDocuments({
+            page: currentPage.value - 1,
+            size: pageSize,
+            author: author.value || undefined,
+            locale: locale.value || undefined,
+            sort: 'createdAt,desc'
+        })
     }
 
     const openDetails = (document) => {
@@ -79,4 +89,15 @@
     onMounted(() => {
         fetchDocuments()
     })
+
+    watch([author, locale], () => {
+        currentPage.value = 1
+        fetchDocuments()
+    })
 </script>
+
+<style scoped>
+    .container {
+        height: calc(100vh - 135px);
+    }
+</style>

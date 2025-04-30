@@ -1,21 +1,23 @@
 <template>
-    <div class="container mt-4">
+    <div class="container mt-4 d-flex flex-column">
         <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-3">
             <h2 class="text-white m-0">Translators</h2>
             <BaseButton @click="showCreateModal = true">New Translator</BaseButton>
         </div>
 
-        <div v-if="translators.length === 0" class="text-white text-center h3 mt-5">
-            No Translators found, please insert them first by clicking on "New Translator".
-        </div>
+        <div class="flex-grow-1 overflow-y-auto mb-2">
+            <div v-if="translators.length === 0" class="text-white text-center h3 mt-5">
+                No Translators found, please insert them first by clicking on "New Translator".
+            </div>
 
-        <div v-else class="d-flex flex-wrap justify-content-center gap-4 py-4">
-            <TranslatorCard
-                v-for="translator in translators"
-                :key="translator.email"
-                :translator="translator"
-                @view-documents="seeTranslatorDocuments(translator)"
-            />
+            <div v-else class="overflow-y-auto d-flex flex-wrap justify-content-center gap-4 py-4">
+                <TranslatorCard
+                    v-for="translator in translators"
+                    :key="translator.email"
+                    :translator="translator"
+                    @view-documents="seeTranslatorDocuments(translator)"
+                />
+            </div>
         </div>
 
         <CreateTranslatorModal

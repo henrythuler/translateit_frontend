@@ -11,6 +11,7 @@ export const useDocumentStore = defineStore('document', {
     state: () => ({
         documents: [],
         total: 0,
+        totalPages: 0,
         loading: false,
         error: null,
     }),
@@ -21,7 +22,8 @@ export const useDocumentStore = defineStore('document', {
                 this.loading = true
                 const response = await getAllDocuments(params)
                 this.documents = response.content || []
-                this.total = response.totalElements || 0
+                this.total = response.page.totalElements || 0
+                this.totalPages = response.page.totalPages
             } catch (err) {
                 this.error = err.message
             } finally {

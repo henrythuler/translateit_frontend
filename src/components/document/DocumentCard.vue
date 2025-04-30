@@ -45,6 +45,7 @@
 <style scoped>
     .document-card {
         width: 100%;
-        max-width: 420px;
+        max-width: 400px;
+        max-height: 350;
     }
 </style>
