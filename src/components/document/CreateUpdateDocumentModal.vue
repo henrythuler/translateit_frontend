@@ -1,7 +1,7 @@
 <template>
     <BaseModal
         :visible="visible"
-        title="New Document"
+        :title="(isEdit ? 'Edit' : 'New') + ' Document'"
         @close="$emit('close')"
     >
         <form @submit.prevent="handleFormSubmit">
@@ -76,9 +76,11 @@
 
     const props = defineProps({
         visible: Boolean,
+        isEdit: Boolean,
+        initialData: Object,
     })
 
-    const emit = defineEmits(['close', 'created'])
+    const emit = defineEmits(['close', 'created', 'updated'])
 
     const form = ref({
         subject: '',
@@ -91,6 +93,7 @@
 
     watch(() => props.visible, (newVal) => {
         if (newVal) {
+            form.value = props.initialData ? {...props.initialData} : form.value
             csvFile.value = null
         }
     })
@@ -101,7 +104,11 @@
             return
         }
         if (csvFile.value) {
-            emit('created', csvFile.value, true)
+            if(props.isEdit){
+                emit('updated', csvFile.value, true)
+            }else{
+                emit('created', csvFile.value, true)
+            }
         } else {
             const document = {
                 subject: form.value.subject,
@@ -115,7 +122,11 @@
                 locale: '',
                 author: '',
             }
-            emit('created', document, false)
+            if (props.isEdit){
+                emit('updated', document, false)
+            }else{
+                emit('created', document, false)
+            }
         }
         emit('close')
     }

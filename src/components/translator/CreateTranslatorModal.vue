@@ -1,7 +1,7 @@
 <template>
     <BaseModal 
         :visible="visible" 
-        title="New Translator" 
+        :title="(isEdit ? 'Edit' : 'New') + ' Translator'"
         @close="$emit('close')"
     >
         <form @submit.prevent="handleFormSubmit">
@@ -31,7 +31,7 @@
                     <label for="source" class="form-label text-white">Source Language</label>
                     <input
                         id="source"
-                        v-model="form.source_language"
+                        v-model="form.sourceLanguage"
                         class="form-control"
                         maxlength="5"
                     />
@@ -40,7 +40,7 @@
                     <label for="target" class="form-label text-white">Target Language</label>
                     <input
                         id="target"
-                        v-model="form.target_language"
+                        v-model="form.targetLanguage"
                         class="form-control"
                         maxlength="5"
                     />
@@ -75,10 +75,12 @@
     import BaseModal from '@/components/base/BaseModal.vue'
 
     const props = defineProps({
-        visible: Boolean
+        visible: Boolean,
+        isEdit: Boolean,
+        initialData: Object,
     })
 
-    const emit = defineEmits(['close', 'created'])
+    const emit = defineEmits(['close', 'created', 'updated'])
 
     const form = ref({
         name: '',
@@ -91,6 +93,7 @@
 
     watch(() => props.visible, (newVal) => {
         if (newVal) {
+            form.value = props.initialData ? {...props.initialData} : form.value
             csvFile.value = null
         }
     })
@@ -101,22 +104,29 @@
             return
         }
         if (csvFile.value) {
-            emit('created', csvFile.value, true)
-            emit('close')
+            if(props.isEdit){
+                emit('updated', csvFile.value, true)
+            }else{
+                emit('created', csvFile.value, true)
+            } 
         } else {
             const translator = {
                 name: form.value.name,
                 email: form.value.email,
-                sourceLanguage: form.value.source_language,
-                targetLanguage: form.value.target_language
+                sourceLanguage: form.value.sourceLanguage,
+                targetLanguage: form.value.targetLanguage
             }
             form.value = {
                 name: '',
                 email: '',
-                source_language: '',
-                target_language: ''
+                sourceLanguage: '',
+                targetLanguage: ''
             }
-            emit('created', translator, false)
+            if (props.isEdit){
+                emit('updated', translator, false)
+            } else {
+                emit('created', translator, false)
+            }
         }
         emit('close')
     }
@@ -124,7 +134,7 @@
     const isFormValid = () => {
         const f = form.value
         return (
-            csvFile.value || (f.name.trim() && f.email.trim() && f.source_language.trim() && f.target_language.trim())
+            csvFile.value || (f.name.trim() && f.email.trim() && f.sourceLanguage.trim() && f.targetLanguage.trim())
         )
     }
 

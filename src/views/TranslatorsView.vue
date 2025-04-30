@@ -2,7 +2,7 @@
     <div class="container mt-4 d-flex flex-column">
         <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-3">
             <h2 class="text-white m-0">Translators</h2>
-            <BaseButton @click="showCreateModal = true">New Translator</BaseButton>
+            <BaseButton @click="openCreateModal">New Translator</BaseButton>
         </div>
 
         <div class="flex-grow-1 overflow-y-auto mb-2">
@@ -16,6 +16,7 @@
                     :key="translator.id"
                     :translator="translator"
                     @view-documents="seeTranslatorDocuments(translator)"
+                    @update="openEditModal(translator)"
                     @delete="handleDelete(translator.id)"
                 />
             </div>
@@ -29,9 +30,12 @@
         />
 
         <CreateTranslatorModal
-            :visible="showCreateModal"
-            @close="showCreateModal = false"
+            :visible="showModal"
+            :isEdit="isEditMode"
+            :initialData="selectedTranslator"
+            @close="showModal = false"
             @created="handleCreated"
+            @updated="handleUpdated"
         />
     </div>
 </template>
@@ -49,7 +53,9 @@
     const router = useRouter()
     const store = useTranslatorStore()
 
-    const showCreateModal = ref(false)
+    const showModal = ref(false)
+    const selectedTranslator = ref(null)
+    const isEditMode = ref(false)
     // const showDetailsModal = ref(false)
     // const selectedTranslator = ref(null)
 
@@ -88,8 +94,15 @@
         } catch (err) {
             console.error(err)
         } finally {
-            showCreateModal.value = false
+            showModal.value = false
         }
+    }
+
+    const handleUpdated = async (data, isCSV) => {
+        const id = selectedTranslator.value?.id
+        if (!id) return
+        await store.editTranslator(id, data, isCSV)
+        fetchTranslators()
     }
 
     const handleDelete = async (id) => {
@@ -99,6 +112,18 @@
         } catch (err) {
             console.error(err)
         }
+    }
+
+    const openCreateModal = () => {
+        isEditMode.value = false
+        selectedTranslator.value = null
+        showModal.value = true
+    }
+
+    const openEditModal = (document) => {
+        isEditMode.value = true
+        selectedTranslator.value = document
+        showModal.value = true
     }
 
     const seeTranslatorDocuments = (translator) => {

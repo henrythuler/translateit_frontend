@@ -4,7 +4,7 @@
             <h2 class="text-white m-0">
                 Documents <span v-if="author"> by {{ author }}</span>
             </h2>
-            <BaseButton @click="showCreateModal = true">New Document</BaseButton>
+            <BaseButton @click="openCreateModal">New Document</BaseButton>
         </div>
         
         <div class="flex-grow-1 overflow-y-auto mb-2">
@@ -18,6 +18,7 @@
                     :key="document.id"
                     :document="document"
                     @view-details="openDetails(document)"
+                    @update="openEditModal(document)"
                     @delete="handleDelete(document.id)"
                 />
             </div>
@@ -30,10 +31,13 @@
             @update:page="handlePageChange"
         />
 
-        <CreateDocumentModal 
-            :visible="showCreateModal" 
-            @close="showCreateModal = false"
+        <CreateUpdateDocumentModal 
+            :visible="showModal"
+            :isEdit="isEditMode"
+            :initialData="selectedDocument"
+            @close="showModal = false"
             @created="handleCreated"
+            @updated="handleUpdated"
         />
 
         <DocumentDetailsModal
@@ -49,17 +53,18 @@
     import { useRoute } from 'vue-router'
     import { useDocumentStore } from '@/stores/documentStore'
     import BaseButton from '@/components/base/BaseButton.vue'
-    import CreateDocumentModal from '@/components/document/CreateDocumentModal.vue'
+    import CreateUpdateDocumentModal from '@/components/document/CreateUpdateDocumentModal.vue'
     import DocumentCard from '@/components/document/DocumentCard.vue'
     import DocumentDetailsModal from '@/components/document/DocumentDetailsModal.vue'
     import BasePagination from '@/components/base/BasePagination.vue'
 
     const route = useRoute()
 
-    const showCreateModal = ref(false)
+    const showModal = ref(false)
     const showDetailsModal = ref(false)
     const selectedDocument = ref(null)
-
+    const isEditMode = ref(false)
+    
     const author = computed(() => route.query.author || '')
     const locale = computed(() => route.query.locale || '')
 
@@ -94,8 +99,15 @@
         } catch (err) {
             console.error(err)
         } finally {
-            showCreateModal.value = false
+            showModal.value = false
         }
+    }
+
+    const handleUpdated = async (data, isCSV) => {
+        const id = selectedDocument.value?.id
+        if (!id) return
+        await store.editDocument(id, data, isCSV)
+        fetchDocuments()
     }
 
     const handleDelete = async (id) => {
@@ -105,6 +117,18 @@
         } catch (err) {
             console.error(err)
         }
+    }
+
+    const openCreateModal = () => {
+        isEditMode.value = false
+        selectedDocument.value = null
+        showModal.value = true
+    }
+
+    const openEditModal = (document) => {
+        isEditMode.value = true
+        selectedDocument.value = document
+        showModal.value = true
     }
 
     const openDetails = (document) => {

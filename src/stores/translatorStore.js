@@ -39,7 +39,7 @@ export const useTranslatorStore = defineStore('translator', {
             return await getTranslatorById(id)
         },
 
-        async editTranslator(id, data, isCSV = false) {
+        async editTranslator(id, data, isCSV) {
             return await updateTranslator(id, data, isCSV)
         },
 
