@@ -1,6 +1,6 @@
 import api from './api'
 
-export const createDocument = async (data, isCSV = false) => {
+export const createDocument = async (data, isCSV) => {
     try {
         if (isCSV) {
             const formData = new FormData()
@@ -14,7 +14,7 @@ export const createDocument = async (data, isCSV = false) => {
             return response.data
         }
     } catch (error) {
-        throw new Error(error.response?.data?.message || 'Failed to create document')
+        throw new Error(error.response?.data?.message || error.response?.data || 'Failed to create document')
     }
 }
 
@@ -23,7 +23,7 @@ export const getAllDocuments = async (params = {}) => {
         const response = await api.get('/documents', { params })
         return response.data
     } catch (error) {
-        throw new Error(error.response?.data?.message || 'Failed to fetch documents')
+        throw new Error(error.response?.data?.message || error.response?.data || 'Failed to fetch documents')
     }
 }
 
@@ -32,7 +32,7 @@ export const getDocumentById = async (id) => {
         const response = await api.get(`/documents/${id}`)
         return response.data
     } catch (error) {
-        throw new Error(error.response?.data?.message || 'Failed to fetch document')
+        throw new Error(error.response?.data?.message || error.response?.data || 'Failed to fetch document')
     }
 }
 
@@ -50,7 +50,7 @@ export const updateDocument = async (id, data, isCSV = false) => {
             return response.data
         }
     } catch (error) {
-        throw new Error(error.response?.data?.message || 'Failed to update document')
+        throw new Error(error.response?.data?.message || error.response?.data || 'Failed to update document')
     }
 }
 
@@ -59,6 +59,6 @@ export const deleteDocument = async (id) => {
         const response = await api.delete(`/documents/${id}`)
         return response.data
     } catch (error) {
-        throw new Error(error.response?.data?.message || 'Failed to delete document')
+        throw new Error(error.response?.data?.message || error.response?.data || 'Failed to delete document')
     }
 }

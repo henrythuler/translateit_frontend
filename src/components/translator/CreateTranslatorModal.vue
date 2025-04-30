@@ -26,7 +26,7 @@
                 />
             </div>
 
-            <div class="mb-3 d-flex gap-2">
+            <div class="mb-3 d-flex align-items-end gap-2">
                 <div class="flex-grow-1">
                     <label for="source" class="form-label text-white">Source Language</label>
                     <input
@@ -71,10 +71,10 @@
 </template>
 
 <script setup>
-    import { ref } from 'vue'
+    import { ref, watch } from 'vue'
     import BaseModal from '@/components/base/BaseModal.vue'
 
-    defineProps({
+    const props = defineProps({
         visible: Boolean
     })
 
@@ -89,23 +89,34 @@
 
     const csvFile = ref(null)
 
+    watch(() => props.visible, (newVal) => {
+        if (newVal) {
+            csvFile.value = null
+        }
+    })
+
     const handleFormSubmit = () => {
         if (!isFormValid()) {
             alert("Please fill all fields or upload a CSV file.")
             return
         }
-        // TODO: send request
         if (csvFile.value) {
-            emit('created', { csv: csvFile.value })
+            emit('created', csvFile.value, true)
             emit('close')
         } else {
             const translator = {
                 name: form.value.name,
                 email: form.value.email,
-                source_language: form.value.source_language,
-                target_language: form.value.target_language
+                sourceLanguage: form.value.source_language,
+                targetLanguage: form.value.target_language
             }
-            emit('created', translator)
+            form.value = {
+                name: '',
+                email: '',
+                source_language: '',
+                target_language: ''
+            }
+            emit('created', translator, false)
         }
         emit('close')
     }

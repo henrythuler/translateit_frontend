@@ -16,6 +16,7 @@
                     :key="translator.id"
                     :translator="translator"
                     @view-documents="seeTranslatorDocuments(translator)"
+                    @delete="handleDelete(translator.id)"
                 />
             </div>
         </div>
@@ -71,6 +72,35 @@
     //     showDetailsModal.value = true
     // }
 
+    const fetchTranslators = () => {
+        store.fetchTranslators({
+            page: currentPage.value - 1,
+            size: pageSize,
+            sort: 'createdAt,desc',
+            email: email.value
+        })
+    }
+
+    const handleCreated = async (data, isCSV = false) => {
+        try {
+            await store.addTranslator(data, isCSV)
+            fetchTranslators()
+        } catch (err) {
+            console.error(err)
+        } finally {
+            showCreateModal.value = false
+        }
+    }
+
+    const handleDelete = async (id) => {
+        try {
+            await store.removeTranslator(id)
+            fetchTranslators()
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
     const seeTranslatorDocuments = (translator) => {
         router.push({
             name: 'Documents',
@@ -81,11 +111,6 @@
     }
 
     onMounted(() => {
-        store.fetchTranslators({
-            page: currentPage.value - 1,
-            size: pageSize,
-            sort: 'createdAt,desc',
-            email: email.value
-        })
+        fetchTranslators()
     })
 </script>

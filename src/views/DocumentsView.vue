@@ -18,6 +18,7 @@
                     :key="document.id"
                     :document="document"
                     @view-details="openDetails(document)"
+                    @delete="handleDelete(document.id)"
                 />
             </div>
         </div>
@@ -66,9 +67,14 @@
     const currentPage = ref(1)
     const pageSize = 9
 
+    watch([author, locale], () => {
+        currentPage.value = 1
+        fetchDocuments()
+    })
+
     const handlePageChange = (newPage) => {
         currentPage.value = newPage
-        store.fetchDocuments({ page: newPage - 1, size: pageSize })
+        fetchDocuments()
     }
 
     const fetchDocuments = () => {
@@ -81,17 +87,32 @@
         })
     }
 
+    const handleCreated = async (data, isCSV) => {
+        try {
+            await store.addDocument(data, isCSV)
+            fetchDocuments()
+        } catch (err) {
+            console.error(err)
+        } finally {
+            showCreateModal.value = false
+        }
+    }
+
+    const handleDelete = async (id) => {
+        try {
+            await store.removeDocument(id)
+            fetchDocuments()
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
     const openDetails = (document) => {
         selectedDocument.value = document
         showDetailsModal.value = true
     }
 
     onMounted(() => {
-        fetchDocuments()
-    })
-
-    watch([author, locale], () => {
-        currentPage.value = 1
         fetchDocuments()
     })
 </script>

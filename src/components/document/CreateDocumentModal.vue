@@ -12,7 +12,6 @@
                     v-model="form.subject"
                     class="form-control"
                     maxlength="255"
-                    required
                 />
             </div>
 
@@ -24,7 +23,6 @@
                     class="form-control"
                     rows="5"
                     maxlength="1000"
-                    required
                 ></textarea>
             </div>
 
@@ -46,7 +44,6 @@
                     type="email"
                     class="form-control"
                     maxlength="255"
-                    required
                 />
             </div>
 
@@ -74,10 +71,10 @@
 </template>
 
 <script setup>
-    import { ref } from 'vue'
+    import { ref, watch } from 'vue'
     import BaseModal from '@/components/base/BaseModal.vue'
 
-    defineProps({
+    const props = defineProps({
         visible: Boolean,
     })
 
@@ -92,14 +89,19 @@
 
     const csvFile = ref(null)
 
+    watch(() => props.visible, (newVal) => {
+        if (newVal) {
+            csvFile.value = null
+        }
+    })
+
     const handleFormSubmit = () => {
         if (!isFormValid()) {
             alert('Please fill all fields or upload a CSV file.')
             return
         }
-        // TODO: send request
         if (csvFile.value) {
-            emit('created', { csv: csvFile.value })
+            emit('created', csvFile.value, true)
         } else {
             const document = {
                 subject: form.value.subject,
@@ -107,7 +109,13 @@
                 locale: form.value?.locale || "",
                 author: form.value.author
             }
-            emit('created', document)
+            form.value = {
+                subject: '',
+                content: '',
+                locale: '',
+                author: '',
+            }
+            emit('created', document, false)
         }
         emit('close')
     }

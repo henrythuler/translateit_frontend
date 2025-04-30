@@ -1,6 +1,6 @@
 import api from './api'
 
-export const createTranslator = async (data, isCSV = false) => {
+export const createTranslator = async (data, isCSV) => {
     try {
         if (isCSV) {
             const formData = new FormData()
@@ -14,7 +14,7 @@ export const createTranslator = async (data, isCSV = false) => {
             return response.data
         }
     } catch (error) {
-        throw new Error(error.response?.data?.message || 'Failed to create translator')
+        throw new Error(error.response?.data?.message || error.response?.data || 'Failed to create translator')
     }
 }
 
@@ -24,7 +24,7 @@ export const getAllTranslators = async (params = {}) => {
         console.log(response)
         return response.data
     } catch (error) {
-        throw new Error(error.response?.data?.message || 'Failed to fetch translators')
+        throw new Error(error.response?.data?.message || error.response?.data || 'Failed to fetch translators')
     }
 }
 
@@ -33,7 +33,7 @@ export const getTranslatorById = async (id) => {
         const response = await api.get(`/translators/${id}`)
         return response.data
     } catch (error) {
-        throw new Error(error.response?.data?.message || 'Failed to fetch translator')
+        throw new Error(error.response?.data?.message || error.response?.data || 'Failed to fetch translator')
     }
 }
 
@@ -51,7 +51,7 @@ export const updateTranslator = async (id, data, isCSV = false) => {
             return response.data
         }
     } catch (error) {
-        throw new Error(error.response?.data?.message || 'Failed to update translator')
+        throw new Error(error.response?.data?.message || error.response?.data || 'Failed to update translator')
     }
 }
 
@@ -60,6 +60,6 @@ export const deleteTranslator = async (id) => {
         const response = await api.delete(`/translators/${id}`)
         return response.data
     } catch (error) {
-        throw new Error(error.response?.data?.message || 'Failed to delete translator')
+        throw new Error(error.response?.data?.message || error.response?.data || 'Failed to delete translator')
     }
 }
