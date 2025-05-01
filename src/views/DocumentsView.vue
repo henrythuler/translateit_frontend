@@ -7,7 +7,7 @@
             <div class="d-flex gap-3">
                 <BaseButton @click="openCreateModal" :disabled="isCreateTranslatorEnabled">New Document</BaseButton>
                 <BaseButton @click="openEditModal(null, true)" :disabled="isCreateTranslatorEnabled || isDocumentsEmpty">Update from CSV</BaseButton>
-                <div v-if="createDisabled">
+                <div v-if="isCreateTranslatorEnabled">
                     <BaseButton @click="openCreateTranslatorModal">Create Translators!</BaseButton>
                     <CreateUpdateTranslatorModal 
                         :visible="showCreateTranslatorModal"
@@ -21,7 +21,30 @@
             </div>
         </div>
         
-        <div class="flex-grow-1 overflow-y-auto mb-2">
+        <form
+            @submit.prevent="handleFilter"
+            class="d-flex flex-wrap gap-2 align-items-center"
+            style="max-width: 100%;"
+        >
+            <input
+                v-model="authorInput"
+                type="text"
+                placeholder="Filter by author"
+                class="form-control"
+                style="max-width: 200px;"
+            />
+            <input
+                v-model="localeInput"
+                type="text"
+                placeholder="Filter by locale"
+                class="form-control"
+                style="max-width: 200px;"
+            />
+            <BaseButton type="submit">Search</BaseButton>
+            <BaseButton type="button" @click="clearFilters" variant="secondary">Clear</BaseButton>
+        </form>
+
+        <div class="flex-grow-1 overflow-y-auto py-2">
             <div v-if="store.loading" class="d-flex justify-content-center align-items-center py-5">
                 <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">Loading...</span>
@@ -35,12 +58,12 @@
                     :document="document"
                     @view-details="openDetails(document)"
                     @update="openEditModal(document, false)"
-                    @delete="handleDelete(document.id)"
+                    @delete="openDeleteModal(document.id)"
                 />
             </div>
         </div>
 
-        <BasePagination
+        <Pagination
             :currentPage="currentPage"
             :totalPages="store.totalPages"
             :pageSize="pageSize"
@@ -57,6 +80,14 @@
             @updated="handleUpdated"
         />
 
+        <ConfirmDeleteModal
+            :visible="showDeleteModal"
+            entityType="document"
+            :loading="isDeleting"
+            @close="showDeleteModal = false"
+            @confirm="handleDelete"
+        />
+
         <DocumentDetailsModal
             :visible="showDetailsModal"
             :document="selectedDocument"
@@ -67,18 +98,21 @@
 
 <script setup>
     import { ref, computed, onMounted, watch } from 'vue'
-    import { useRoute } from 'vue-router'
+    import { useRoute, useRouter } from 'vue-router'
     import { useDocumentStore } from '@/stores/documentStore'
     import { useTranslatorStore } from '@/stores/translatorStore'
     import { useToast } from 'vue-toastification'
     import BaseButton from '@/components/base/BaseButton.vue'
     import CreateUpdateDocumentModal from '@/components/document/CreateUpdateDocumentModal.vue'
     import CreateUpdateTranslatorModal from '@/components/translator/CreateUpdateTranslatorModal.vue'
+    import ConfirmDeleteModal from '@/components/layout/ConfirmDeleteModal.vue'
     import DocumentCard from '@/components/document/DocumentCard.vue'
     import DocumentDetailsModal from '@/components/document/DocumentDetailsModal.vue'
-    import BasePagination from '@/components/base/BasePagination.vue'
+    import Pagination from '@/components/layout/Pagination.vue'
 
     const route = useRoute()
+    const router = useRouter()
+
     const toast = useToast()
     const store = useDocumentStore()
     const translatorStore = useTranslatorStore()
@@ -93,9 +127,31 @@
     const isEditCsv = ref(false)
     const isCreateTranslatorEnabled = ref(false)
     const isDocumentsEmpty = ref(false)
+    const showDeleteModal = ref(false)
+    const isDeleting = ref(false)
+    const deletingId = ref(null)
 
     const author = computed(() => route.query.author || '')
     const locale = computed(() => route.query.locale || '')
+
+    const authorInput = ref(author.value)
+    const localeInput = ref(locale.value)
+
+    const handleFilter = () => {
+        router.push({
+            query: {
+                ...route.query,
+                author: authorInput.value || undefined,
+                locale: localeInput.value || undefined,
+            }
+        })
+    }
+
+    const clearFilters = () => {
+        authorInput.value = ''
+        localeInput.value = ''
+        router.push({ query: {} })
+    }
 
     watch([author, locale], () => {
         currentPage.value = 1
@@ -181,13 +237,18 @@
         }
     }
 
-    const handleDelete = async (id) => {
+    const handleDelete = async () => {
+        isDeleting.value = true
         try {
-            await store.removeDocument(id)
+            await store.removeDocument(deletingId.value)
             toast.success("Document deleted!")
             fetchDocuments()
         } catch (err) {
             toast.error(`${err.message}`)
+        } finally {
+            isDeleting.value = false
+            deletingId.value = null
+            showDeleteModal.value = false
         }
     }
 
@@ -214,6 +275,11 @@
         showModal.value = true
     }
 
+    const openDeleteModal = (id) => {
+        deletingId.value = id
+        showDeleteModal.value = true
+    }
+
     const openDetails = (document) => {
         selectedDocument.value = document
         showDetailsModal.value = true
@@ -226,6 +292,6 @@
 
 <style scoped>
     .container {
-        height: calc(100vh - 135px);
+        height: calc(100vh - 150px);
     }
 </style>

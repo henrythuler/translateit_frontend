@@ -22,12 +22,12 @@
                     :translator="translator"
                     @view-documents="seeTranslatorDocuments(translator)"
                     @update="openEditModal(translator, false)"
-                    @delete="handleDelete(translator.id)"
+                    @delete="openDeleteModal(translator.id)"
                 />
             </div>
         </div>
 
-        <BasePagination
+        <Pagination
             :currentPage="currentPage"
             :totalPages="store.totalPages"
             :pageSize="pageSize"
@@ -43,6 +43,14 @@
             @created="handleCreated"
             @updated="handleUpdated"
         />
+
+        <ConfirmDeleteModal
+            :visible="showDeleteModal"
+            entityType="translator"
+            :loading="isDeleting"
+            @close="showDeleteModal = false"
+            @confirm="handleDelete"
+        />
     </div>
 </template>
 
@@ -55,7 +63,8 @@
     import BaseButton from '@/components/base/BaseButton.vue'
     import TranslatorCard from '@/components/translator/TranslatorCard.vue'
     import CreateUpdateTranslatorModal from '@/components/translator/CreateUpdateTranslatorModal.vue'
-    import BasePagination from '@/components/base/BasePagination.vue'
+    import ConfirmDeleteModal from '@/components/layout/ConfirmDeleteModal.vue'
+    import Pagination from '@/components/layout/Pagination.vue'
 
     const route = useRoute()
     const router = useRouter()
@@ -68,6 +77,9 @@
     const isEditMode = ref(false)
     const isEditCsv = ref(false)
     const isTranslatorsEmpty = ref(false)
+    const showDeleteModal = ref(false)
+    const isDeleting = ref(false)
+    const deletingId = ref(null)
 
     const email = computed(() => route.query.email || '')
     const currentPage = ref(1)
@@ -126,9 +138,9 @@
         }
     }
 
-    const handleDelete = async (id) => {
+    const handleDelete = async () => {
         try {
-            await store.removeTranslator(id)
+            await store.removeTranslator(deletingId.value)
             toast.success("Translator deleted!")
             fetchTranslators()
             await documentStore.fetchDocuments({
@@ -140,6 +152,10 @@
             })
         } catch (err) {
             toast.error(`${err.message}`)
+        } finally {
+            isDeleting.value = false
+            deletingId.value = null
+            showDeleteModal.value = false
         }
     }
 
@@ -160,6 +176,11 @@
             selectedTranslator.value = translator
         }
         showModal.value = true
+    }
+
+    const openDeleteModal = (id) => {
+        deletingId.value = id
+        showDeleteModal.value = true
     }
 
     const seeTranslatorDocuments = (translator) => {

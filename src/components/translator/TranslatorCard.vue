@@ -38,6 +38,6 @@
 <style scoped>
     .translator-card {
         width: 100%;
-        max-width: 420px;
+        max-width: 400px;
     }
 </style>
