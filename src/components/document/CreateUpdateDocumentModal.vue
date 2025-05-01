@@ -74,6 +74,7 @@
 
 <script setup>
     import { ref, watch } from 'vue'
+    import { useToast } from 'vue-toastification'
     import BaseModal from '@/components/base/BaseModal.vue'
 
     const props = defineProps({
@@ -92,7 +93,9 @@
         author: '',
     })
 
+    const toast = useToast()
     const csvFile = ref(null)
+    const submitting = ref(false)
 
     watch(() => props.visible, (newVal) => {
         if (newVal) {
@@ -100,38 +103,47 @@
             csvFile.value = null
         }
     })
-
+    
     const handleFormSubmit = () => {
         if (!isFormValid()) {
-            alert('Please fill all fields or upload a CSV file.')
+            toast.warning('Please fill all fields or upload a CSV file.')
             return
         }
-        if (csvFile.value) {
-            if(props.isEditCsv){
-                emit('updated', csvFile.value, true)
-            }else{
-                emit('created', csvFile.value, true)
+
+        submitting.value = true
+        
+        try {
+            if (csvFile.value) {
+                if(props.isEditCsv){
+                    emit('updated', csvFile.value, true)
+                }else{
+                    emit('created', csvFile.value, true)
+                }
+            } else {
+                const document = {
+                    subject: form.value.subject,
+                    content: form.value.content,
+                    locale: form.value?.locale || "",
+                    author: form.value.author
+                }
+                if (props.isEdit){
+                    emit('updated', document, false)
+                }else{
+                    emit('created', document, false)
+                }
             }
-        } else {
-            const document = {
-                subject: form.value.subject,
-                content: form.value.content,
-                locale: form.value?.locale || "",
-                author: form.value.author
-            }
+        } catch (err) {
+            toast.error(`${err}`)
+        } finally {
             form.value = {
                 subject: '',
                 content: '',
                 locale: '',
                 author: '',
             }
-            if (props.isEdit){
-                emit('updated', document, false)
-            }else{
-                emit('created', document, false)
-            }
+            submitting.value = false
+            emit('close')
         }
-        emit('close')
     }
 
     const isFormValid = () => {

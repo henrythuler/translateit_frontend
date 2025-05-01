@@ -63,11 +63,12 @@
 
             <div class="text-end">
                 <button
-                    :disabled="!isFormValid()"
+                    :disabled="!isFormValid() || submitting"
                     type="submit"
                     class="btn btn-primary bg-orange border-0"
                 >
-                    Send
+                    <span v-if="submitting" class="spinner-border spinner-border-sm me-2"></span>
+                    {{ submitting ? 'Sending...' : 'Send' }}
                 </button>
             </div>
         </form>
@@ -76,6 +77,7 @@
 
 <script setup>
     import { ref, watch } from 'vue'
+    import { useToast } from 'vue-toastification'
     import BaseModal from '@/components/base/BaseModal.vue'
 
     const props = defineProps({
@@ -94,7 +96,9 @@
         targetLanguage: ''
     })
 
+    const toast = useToast()
     const csvFile = ref(null)
+    const submitting = ref(false)
 
     watch(() => props.visible, (newVal) => {
         if (newVal) {
@@ -105,35 +109,44 @@
 
     const handleFormSubmit = () => {
         if (!isFormValid()) {
-            alert("Please fill all fields or upload a CSV file.")
+            toast.warning("Please fill all fields or upload a CSV file.")
             return
         }
-        if (csvFile.value) {
-            if (props.isEditCsv) {
-                emit('updated', csvFile.value, true)
+
+        submitting.value = true
+
+        try {
+            if (csvFile.value) {
+                if (props.isEditCsv) {
+                    emit('updated', csvFile.value, true)
+                } else {
+                    emit('created', csvFile.value, true)
+                }
             } else {
-                emit('created', csvFile.value, true)
+                const translator = {
+                    name: form.value.name,
+                    email: form.value.email,
+                    sourceLanguage: form.value.sourceLanguage,
+                    targetLanguage: form.value.targetLanguage
+                }
+                if (props.isEdit){
+                    emit('updated', translator, false)
+                } else {
+                    emit('created', translator, false)
+                }
             }
-        } else {
-            const translator = {
-                name: form.value.name,
-                email: form.value.email,
-                sourceLanguage: form.value.sourceLanguage,
-                targetLanguage: form.value.targetLanguage
-            }
+        } catch (err) {
+            toast.error(`${err}`)
+        } finally {
             form.value = {
                 name: '',
                 email: '',
                 sourceLanguage: '',
                 targetLanguage: ''
             }
-            if (props.isEdit){
-                emit('updated', translator, false)
-            } else {
-                emit('created', translator, false)
-            }
+            submitting.value = false
+            emit('close')
         }
-        emit('close')
     }
 
     const isFormValid = () => {

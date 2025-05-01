@@ -24,9 +24,12 @@ export const useTranslatorStore = defineStore('translator', {
                 this.translators = response.content || []
                 this.total = response.page.totalElements || 0
                 this.totalPages = response.page.totalPages
+                this.error = null
             } catch (err) {
-                this.error = err.message
+                this.error = `${err.message} Please, create them.`
+                this.translators = []
             } finally {
+                
                 this.loading = false
             }
         },

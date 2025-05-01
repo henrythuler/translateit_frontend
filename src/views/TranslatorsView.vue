@@ -4,13 +4,15 @@
             <h2 class="text-white m-0">Translators</h2>
             <div class="d-flex gap-3">
                 <BaseButton @click="openCreateModal">New Translator</BaseButton>
-                <BaseButton @click="openEditModal(null, true)">Update from CSV</BaseButton>
+                <BaseButton @click="openEditModal(null, true)" :disabled="isTranslatorsEmpty">Update from CSV</BaseButton>
             </div>
         </div>
 
         <div class="flex-grow-1 overflow-y-auto mb-2">
-            <div v-if="store.translators.length === 0" class="text-white text-center h3 mt-5">
-                No Translators found, please insert them first by clicking on "New Translator".
+            <div v-if="store.loading" class="d-flex justify-content-center align-items-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
             </div>
 
             <div v-else class="overflow-y-auto d-flex flex-wrap justify-content-center gap-4 py-4">
@@ -48,6 +50,7 @@
     import { ref, onMounted, computed } from 'vue'
     import { useRoute, useRouter } from 'vue-router'
     import { useTranslatorStore } from '@/stores/translatorStore'
+    import { useDocumentStore } from '@/stores/documentStore'
     import { useToast } from 'vue-toastification'
     import BaseButton from '@/components/base/BaseButton.vue'
     import TranslatorCard from '@/components/translator/TranslatorCard.vue'
@@ -57,12 +60,14 @@
     const route = useRoute()
     const router = useRouter()
     const store = useTranslatorStore()
+    const documentStore = useDocumentStore()
     const toast = useToast()
 
     const showModal = ref(false)
     const selectedTranslator = ref(null)
     const isEditMode = ref(false)
     const isEditCsv = ref(false)
+    const isTranslatorsEmpty = ref(false)
 
     const email = computed(() => route.query.email || '')
     const currentPage = ref(1)
@@ -78,13 +83,18 @@
         })
     }
 
-    const fetchTranslators = () => {
-        store.fetchTranslators({
+    const fetchTranslators = async () => {
+        await store.fetchTranslators({
             page: currentPage.value - 1,
             size: pageSize,
             sort: 'createdAt,desc',
             email: email.value
         })
+        isTranslatorsEmpty.value = false
+        if (store.error) {
+            isTranslatorsEmpty.value = true
+            toast(`${store.error}`)
+        }
     }
 
     const handleCreated = async (data, isCSV = false) => {
@@ -93,7 +103,7 @@
             toast.success("Translator(s) created!")
             fetchTranslators()
         } catch (err) {
-            toast.error(`${err}`)
+            toast.error(`${err.message}`)
         } finally {
             showModal.value = false
         }
@@ -110,7 +120,7 @@
             toast.success("Translator(s) updated!")
             fetchTranslators()
         } catch (err) {
-            toast.error(`${err}`)
+            toast.error(`${err.message}`)
         } finally {
             showModal.value = false
         }
@@ -121,8 +131,15 @@
             await store.removeTranslator(id)
             toast.success("Translator deleted!")
             fetchTranslators()
+            await documentStore.fetchDocuments({
+                page: 0,
+                size: pageSize,
+                author: undefined,
+                locale: undefined,
+                sort: 'createdAt,desc'
+            })
         } catch (err) {
-            toast.error(`${err}`)
+            toast.error(`${err.message}`)
         }
     }
 

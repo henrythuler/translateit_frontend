@@ -24,8 +24,10 @@ export const useDocumentStore = defineStore('document', {
                 this.documents = response.content || []
                 this.total = response.page.totalElements || 0
                 this.totalPages = response.page.totalPages
+                this.error = null
             } catch (err) {
-                this.error = err.message
+                this.error = `${err.message} Please, create them.`
+                this.documents = []
             } finally {
                 this.loading = false
             }

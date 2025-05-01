@@ -36,4 +36,9 @@
         background-color: #f96418;
         color: #ffffff;
     }
+
+    .custom-btn:disabled {
+        background-color: transparent;
+        color: #999;
+    }
 </style>
