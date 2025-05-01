@@ -90,7 +90,7 @@
         store.fetchTranslators({
             page: newPage - 1,
             size: pageSize,
-            sort: 'createdAt,desc',
+            sort: ['createdAt,desc', 'name,asc'],
             email: email.value
         })
     }
@@ -99,7 +99,7 @@
         await store.fetchTranslators({
             page: currentPage.value - 1,
             size: pageSize,
-            sort: 'createdAt,desc',
+            sort: ['createdAt,desc', 'name,asc'],
             email: email.value
         })
         isTranslatorsEmpty.value = false
@@ -148,7 +148,7 @@
                 size: pageSize,
                 author: undefined,
                 locale: undefined,
-                sort: 'createdAt,desc'
+                sort: ['createdAt,desc', 'author,asc'],
             })
         } catch (err) {
             toast.error(`${err.message}`)
@@ -196,3 +196,9 @@
         fetchTranslators()
     })
 </script>
+
+<style scoped>
+    .container {
+        height: calc(100vh - 170px);
+    }
+</style>

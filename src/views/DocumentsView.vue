@@ -167,7 +167,7 @@
         await translatorStore.fetchTranslators({
             page: 0,
             size: pageSize,
-            sort: 'createdAt,desc',
+            sort: ['createdAt,desc', 'name,asc'],
         })
         if (translatorStore.translators.length === 0) {
             toast('There is no Translators, you should create them before creating a Document!', { timeout: 5000 })
@@ -182,7 +182,7 @@
             size: pageSize,
             author: author.value || undefined,
             locale: locale.value || undefined,
-            sort: 'createdAt,desc'
+            sort: ['createdAt,desc', 'author,asc']
         })
         isDocumentsEmpty.value = false
         if (store.error) {
@@ -210,7 +210,7 @@
             translatorStore.fetchTranslators({
                 page: 0,
                 size: pageSize,
-                sort: 'createdAt,desc',
+                sort: ['createdAt,desc', 'author,asc'],
             })
             isCreateTranslatorEnabled.value = false
         } catch (err) {
