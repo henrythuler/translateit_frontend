@@ -21,7 +21,6 @@ export const createTranslator = async (data, isCSV) => {
 export const getAllTranslators = async (params = {}) => {
     try {
         const response = await api.get('/translators', { params })
-        console.log(response)
         return response.data
     } catch (error) {
         throw new Error(error.response?.data?.message || error.response?.data || 'Failed to fetch translators')

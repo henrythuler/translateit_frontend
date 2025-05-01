@@ -2,7 +2,10 @@
     <div class="container mt-4 d-flex flex-column">
         <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-3">
             <h2 class="text-white m-0">Translators</h2>
-            <BaseButton @click="openCreateModal">New Translator</BaseButton>
+            <div class="d-flex gap-3">
+                <BaseButton @click="openCreateModal">New Translator</BaseButton>
+                <BaseButton @click="openEditModal(null, true)">Update from CSV</BaseButton>
+            </div>
         </div>
 
         <div class="flex-grow-1 overflow-y-auto mb-2">
@@ -16,7 +19,7 @@
                     :key="translator.id"
                     :translator="translator"
                     @view-documents="seeTranslatorDocuments(translator)"
-                    @update="openEditModal(translator)"
+                    @update="openEditModal(translator, false)"
                     @delete="handleDelete(translator.id)"
                 />
             </div>
@@ -29,9 +32,10 @@
             @update:page="handlePageChange"
         />
 
-        <CreateTranslatorModal
+        <CreateUpdateTranslatorModal
             :visible="showModal"
             :isEdit="isEditMode"
+            :isEditCsv="isEditCsv"
             :initialData="selectedTranslator"
             @close="showModal = false"
             @created="handleCreated"
@@ -44,20 +48,21 @@
     import { ref, onMounted, computed } from 'vue'
     import { useRoute, useRouter } from 'vue-router'
     import { useTranslatorStore } from '@/stores/translatorStore'
+    import { useToast } from 'vue-toastification'
     import BaseButton from '@/components/base/BaseButton.vue'
     import TranslatorCard from '@/components/translator/TranslatorCard.vue'
-    import CreateTranslatorModal from '@/components/translator/CreateTranslatorModal.vue'
+    import CreateUpdateTranslatorModal from '@/components/translator/CreateUpdateTranslatorModal.vue'
     import BasePagination from '@/components/base/BasePagination.vue'
 
     const route = useRoute()
     const router = useRouter()
     const store = useTranslatorStore()
+    const toast = useToast()
 
     const showModal = ref(false)
     const selectedTranslator = ref(null)
     const isEditMode = ref(false)
-    // const showDetailsModal = ref(false)
-    // const selectedTranslator = ref(null)
+    const isEditCsv = ref(false)
 
     const email = computed(() => route.query.email || '')
     const currentPage = ref(1)
@@ -73,11 +78,6 @@
         })
     }
 
-    // const openDetails = (translator) => {
-    //     selectedTranslator.value = translator
-    //     showDetailsModal.value = true
-    // }
-
     const fetchTranslators = () => {
         store.fetchTranslators({
             page: currentPage.value - 1,
@@ -90,39 +90,58 @@
     const handleCreated = async (data, isCSV = false) => {
         try {
             await store.addTranslator(data, isCSV)
+            toast.success("Translator(s) created!")
             fetchTranslators()
         } catch (err) {
-            console.error(err)
+            toast.error(`${err}`)
         } finally {
             showModal.value = false
         }
     }
 
     const handleUpdated = async (data, isCSV) => {
-        const id = selectedTranslator.value?.id
-        if (!id) return
-        await store.editTranslator(id, data, isCSV)
-        fetchTranslators()
+        try{
+            let id = null
+            if (!isCSV) {
+                id = selectedTranslator.value?.id
+                if (!id) throw new Error('No id has been passed!')
+            }
+            await store.editTranslator(id, data, isCSV)
+            toast.success("Translator(s) updated!")
+            fetchTranslators()
+        } catch (err) {
+            toast.error(`${err}`)
+        } finally {
+            showModal.value = false
+        }
     }
 
     const handleDelete = async (id) => {
         try {
             await store.removeTranslator(id)
+            toast.success("Translator deleted!")
             fetchTranslators()
         } catch (err) {
-            console.error(err)
+            toast.error(`${err}`)
         }
     }
 
     const openCreateModal = () => {
         isEditMode.value = false
+        isEditCsv.value = false
         selectedTranslator.value = null
         showModal.value = true
     }
 
-    const openEditModal = (document) => {
-        isEditMode.value = true
-        selectedTranslator.value = document
+    const openEditModal = (translator, isCsv) => {
+        if(isCsv){
+            isEditCsv.value = true
+            isEditMode.value = false
+        }else{
+            isEditMode.value = true
+            isEditCsv.value = false
+            selectedTranslator.value = translator
+        }
         showModal.value = true
     }
 

@@ -36,7 +36,7 @@ export const getDocumentById = async (id) => {
     }
 }
 
-export const updateDocument = async (id, data, isCSV = false) => {
+export const updateDocument = async (id, data, isCSV) => {
     try {
         if (isCSV) {
             const formData = new FormData()

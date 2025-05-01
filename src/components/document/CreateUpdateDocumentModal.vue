@@ -1,53 +1,55 @@
 <template>
     <BaseModal
         :visible="visible"
-        :title="(isEdit ? 'Edit' : 'New') + ' Document'"
+        :title="(isEdit ? 'Edit Document' : isEditCsv ? 'Edit Documents from CSV' : 'New Document')"
         @close="$emit('close')"
     >
         <form @submit.prevent="handleFormSubmit">
-            <div class="mb-3">
-                <label for="subject" class="form-label text-white">Subject</label>
-                <input
-                    id="subject"
-                    v-model="form.subject"
-                    class="form-control"
-                    maxlength="255"
-                />
+            <div v-show="!isEditCsv">
+                <div class="mb-3">
+                    <label for="subject" class="form-label text-white">Subject</label>
+                    <input
+                        id="subject"
+                        v-model="form.subject"
+                        class="form-control"
+                        maxlength="255"
+                    />
+                </div>
+
+                <div class="mb-3">
+                    <label for="content" class="form-label text-white">Content</label>
+                    <textarea
+                        id="content"
+                        v-model="form.content"
+                        class="form-control"
+                        rows="5"
+                        maxlength="1000"
+                    ></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="locale" class="form-label text-white">Locale (Optional)</label>
+                    <input
+                        id="locale"
+                        v-model="form.locale"
+                        class="form-control"
+                        maxlength="5"
+                    />
+                </div>
+
+                <div class="mb-3">
+                    <label for="author" class="form-label text-white">Author (Email)</label>
+                    <input
+                        id="author"
+                        v-model="form.author"
+                        type="email"
+                        class="form-control"
+                        maxlength="255"
+                    />
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label for="content" class="form-label text-white">Content</label>
-                <textarea
-                    id="content"
-                    v-model="form.content"
-                    class="form-control"
-                    rows="5"
-                    maxlength="1000"
-                ></textarea>
-            </div>
-
-            <div class="mb-3">
-                <label for="locale" class="form-label text-white">Locale (Optional)</label>
-                <input
-                    id="locale"
-                    v-model="form.locale"
-                    class="form-control"
-                    maxlength="5"
-                />
-            </div>
-
-            <div class="mb-3">
-                <label for="author" class="form-label text-white">Author (Email)</label>
-                <input
-                    id="author"
-                    v-model="form.author"
-                    type="email"
-                    class="form-control"
-                    maxlength="255"
-                />
-            </div>
-
-            <div class="mb-3">
+            <div v-show="!isEdit || isEditCsv" class="mb-3">
                 <label class="form-label text-white">Import from CSV</label>
                 <input
                     type="file"
@@ -77,6 +79,7 @@
     const props = defineProps({
         visible: Boolean,
         isEdit: Boolean,
+        isEditCsv: Boolean,
         initialData: Object,
     })
 
@@ -104,7 +107,7 @@
             return
         }
         if (csvFile.value) {
-            if(props.isEdit){
+            if(props.isEditCsv){
                 emit('updated', csvFile.value, true)
             }else{
                 emit('created', csvFile.value, true)

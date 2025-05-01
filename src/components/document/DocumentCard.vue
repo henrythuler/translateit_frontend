@@ -35,7 +35,7 @@
         }
     })
 
-    defineEmits(['view-details'])
+    defineEmits(['view-details', 'update', 'delete'])
 
     const truncate = (text = '', max) => {
         return text.length > max ? text.slice(0, max).trim() + '...' : text
