@@ -82,6 +82,7 @@
     const deletingId = ref(null)
 
     const email = computed(() => route.query.email || '')
+
     const currentPage = ref(1)
     const pageSize = 9
 

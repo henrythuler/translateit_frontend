@@ -23,7 +23,7 @@
         
         <form
             @submit.prevent="handleFilter"
-            class="d-flex flex-wrap gap-2 align-items-center"
+            class="d-flex flex-wrap gap-2 align-items-center mb-2"
             style="max-width: 100%;"
         >
             <input

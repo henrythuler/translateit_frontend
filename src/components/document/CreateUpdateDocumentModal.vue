@@ -65,7 +65,8 @@
                     type="submit"
                     class="btn btn-primary bg-orange border-0"
                 >
-                    Send
+                    <span v-if="submitting" class="spinner-border spinner-border-sm me-2"></span>
+                    {{ submitting ? 'Sending...' : 'Send' }}
                 </button>
             </div>
         </form>
@@ -101,6 +102,7 @@
         if (newVal) {
             form.value = props.initialData ? {...props.initialData} : form.value
             csvFile.value = null
+            submitting.value = false
         }
     })
     
@@ -141,8 +143,6 @@
                 locale: '',
                 author: '',
             }
-            submitting.value = false
-            emit('close')
         }
     }
 
