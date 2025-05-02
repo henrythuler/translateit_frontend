@@ -1,10 +1,17 @@
-<script setup>
-import { RouterView } from 'vue-router'
-</script>
-
 <template>
-  <RouterView />
+    <TheHeader />
+    <RouterView />
 </template>
 
-<style scoped>
+<script setup>
+    import { RouterView } from 'vue-router'
+    import TheHeader from '@/components/layout/TheHeader.vue'
+</script>
+
+<style>
+    #app{
+        max-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
 </style>
