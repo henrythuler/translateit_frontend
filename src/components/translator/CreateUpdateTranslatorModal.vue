@@ -102,7 +102,7 @@
 
     watch(() => props.visible, (newVal) => {
         if (newVal) {
-            form.value = props.initialData ? {...props.initialData} : form.value
+            form.value = props.initialData ? {...props.initialData} : { name: '', email: '', sourceLanguage: '', targetLanguage: '' }
             csvFile.value = null
         }
     })
@@ -145,7 +145,6 @@
                 targetLanguage: ''
             }
             submitting.value = false
-            emit('close')
         }
     }
 

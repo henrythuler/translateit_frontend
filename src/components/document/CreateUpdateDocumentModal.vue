@@ -100,7 +100,7 @@
 
     watch(() => props.visible, (newVal) => {
         if (newVal) {
-            form.value = props.initialData ? {...props.initialData} : form.value
+            form.value = props.initialData ? {...props.initialData} : { subject: '', content: '', locale: '', author: '' }
             csvFile.value = null
             submitting.value = false
         }
