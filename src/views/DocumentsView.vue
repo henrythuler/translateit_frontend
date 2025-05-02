@@ -22,6 +22,7 @@
         </div>
         
         <form
+            v-if="!isCreateTranslatorEnabled && !isDocumentsEmpty"
             @submit.prevent="handleFilter"
             class="d-flex flex-wrap gap-2 align-items-center mb-2"
             style="max-width: 100%;"
@@ -109,6 +110,7 @@
     import DocumentCard from '@/components/document/DocumentCard.vue'
     import DocumentDetailsModal from '@/components/document/DocumentDetailsModal.vue'
     import Pagination from '@/components/layout/Pagination.vue'
+import { createTranslator } from '@/services/translatorService'
 
     const route = useRoute()
     const router = useRouter()
